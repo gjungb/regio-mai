@@ -1,30 +1,34 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, map, of } from 'rxjs';
 import { Led } from '../model/led';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LedService {
-  constructor() {}
+  #url =
+    'https://347eb1836965ec040f474bd7f78d4730.balena-devices.com/api/colors';
+
+  #client = inject(HttpClient);
 
   /**
    *
    * @returns
    */
-  readLeds(): Array<Led> {
-    return [
-      {
-        index: 0,
-        color: 'black',
-      },
-      {
-        index: 1,
-        color: 'red',
-      },
-      {
-        index: 2,
-        color: 'goldenrod',
-      },
-    ];
+  readLeds(): Observable<Array<Led>> {
+    const colors$ = this.#client.get<string[]>(this.#url);
+
+    return colors$.pipe(
+      catchError(() => of(['black', 'red', 'goldenrod'])),
+      map((colors) => {
+        return colors.map((color, index) => {
+          return {
+            color,
+            index,
+          };
+        });
+      })
+    );
   }
 }
