@@ -1,5 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
+import { Led } from '../model/led';
+import { LedService } from '../shared/led.service';
 
 @Component({
   selector: 'pi-detail',
@@ -9,9 +12,13 @@ import { ActivatedRoute } from '@angular/router';
 export class DetailComponent implements OnInit {
   #route = inject(ActivatedRoute);
 
-  ngOnInit(): void {
-    const i = this.#route.snapshot.paramMap.get('index');
+  #service = inject(LedService);
 
-    console.log(i);
+  led$?: Observable<Led>;
+
+  ngOnInit(): void {
+    const index = this.#route.snapshot.paramMap.get('index');
+
+    this.led$ = this.#service.readLed(Number(index));
   }
 }

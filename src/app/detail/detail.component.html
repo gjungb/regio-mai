@@ -1,3 +1,9 @@
 <p>detail works!</p>
 
-<pi-led></pi-led>
+<ng-container *ngIf="led$ | async as led; else loader">
+  <pi-led [piLed]="led"></pi-led>
+</ng-container>
+
+<ng-template #loader>
+  <p>Am Laden...</p>
+</ng-template>
