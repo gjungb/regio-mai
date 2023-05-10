@@ -1,8 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map, tap, timer } from 'rxjs';
 import { Led } from '../model/led';
 import { LedService } from '../shared/led.service';
-import { tap, timer } from 'rxjs';
 
 /**
  * Stateful Component
@@ -15,22 +15,23 @@ import { tap, timer } from 'rxjs';
 export class LedListComponent implements OnInit {
   #service = inject(LedService);
 
-  leds: Array<Led> = [];
+  #dr = inject(DestroyRef);
 
-  constructor() {
-    timer(2000, 5000)
-      .pipe(
-        tap((i) => console.log(i)),
-        takeUntilDestroyed()
-      )
-      .subscribe();
-  }
+  leds: Array<Led> = [];
 
   ngOnInit() {
     this.#service
       .readLeds()
       .pipe(tap((x) => console.log(x)))
       .subscribe((value) => (this.leds = value));
+
+    timer(2000, 5000)
+      .pipe(
+        map((i) => i + 1),
+        tap((i) => console.log(i)),
+        takeUntilDestroyed(this.#dr)
+      )
+      .subscribe();
   }
 
   /**
