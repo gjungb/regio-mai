@@ -41,5 +41,15 @@ export class LedListComponent implements OnInit {
   updateColor(index: number): void {
     // effect
     console.log(index);
+
+    this.#service
+      .updateLed(index)
+      .pipe(
+        tap((v) => console.log(v)),
+        takeUntilDestroyed(this.#dr)
+      )
+      .subscribe({
+        next: (led) => (this.leds[led.index] = led),
+      });
   }
 }

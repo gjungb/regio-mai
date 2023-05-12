@@ -58,4 +58,23 @@ export class LedService {
       map((color) => ({ index, color }))
     );
   }
+
+  /**
+   *
+   * @param index
+   * @param color
+   */
+  updateLed(
+    index: number,
+    color = tinycolor.random().toString()
+  ): Observable<Led> {
+    const url = `${this.#url}/${index}`;
+    const body = { color };
+    const color$ = this.#client.put(url, body, { responseType: 'text' });
+
+    return color$.pipe(
+      catchError(() => of()),
+      map((color) => ({ index, color }))
+    );
+  }
 }
